@@ -27,6 +27,14 @@ public class GuestServiceImpl implements GuestService {
     public Guest createGuest(String name, String email, String phone) {
         validateGuest(name, email, phone);
 
+        String normalizedPhone = phone.replaceAll("[\\s()-]", "");
+
+        if (!normalizedPhone.matches("\\+?\\d{10,15}")) {
+            throw new ValidationException(
+                    "Некорректный номер телефона. Введите от 10 до 15 цифр."
+            );
+        }
+
         boolean emailExists = guestRepository.findAll().stream()
                 .anyMatch(guest -> guest.getEmail().equalsIgnoreCase(email.trim()));
 

@@ -1,5 +1,6 @@
 package ru.vsu.cs.maximova;
 
+import ru.vsu.cs.maximova.entity.Guest;
 import ru.vsu.cs.maximova.entity.Room;
 import ru.vsu.cs.maximova.entity.RoomType;
 import ru.vsu.cs.maximova.ex.AppException;
@@ -34,6 +35,7 @@ public class ConsoleUI {
         while (running) {
             printMenu();
             System.out.print("Выберите действие: ");
+
             String choice = scanner.nextLine().trim();
 
             switch (choice) {
@@ -42,9 +44,7 @@ public class ConsoleUI {
                     break;
 
                 case "2":
-                    System.out.println(
-                            "Управление гостями будет добавлено следующим этапом."
-                    );
+                    guestsMenu();
                     break;
 
                 case "3":
@@ -72,6 +72,7 @@ public class ConsoleUI {
         System.out.println("3. Управление бронированиями");
         System.out.println("0. Выход");
     }
+
 
     private void roomsMenu() {
         boolean running = true;
@@ -111,6 +112,7 @@ public class ConsoleUI {
             int number = Integer.parseInt(scanner.nextLine().trim());
 
             System.out.println("Доступные типы номеров:");
+
             for (RoomType type : RoomType.values()) {
                 System.out.println("- " + type);
             }
@@ -121,10 +123,14 @@ public class ConsoleUI {
             );
 
             System.out.print("Введите стоимость за ночь: ");
-            BigDecimal price = new BigDecimal(scanner.nextLine().trim());
+            BigDecimal price = new BigDecimal(
+                    scanner.nextLine().trim()
+            );
 
             System.out.print("Введите вместимость: ");
-            int capacity = Integer.parseInt(scanner.nextLine().trim());
+            int capacity = Integer.parseInt(
+                    scanner.nextLine().trim()
+            );
 
             Room room = roomService.createRoom(
                     number,
@@ -158,6 +164,84 @@ public class ConsoleUI {
                             + " | Тип: " + room.getType()
                             + " | Цена за ночь: " + room.getPricePerNight()
                             + " | Вместимость: " + room.getCapacity()
+            );
+        }
+    }
+
+
+    private void guestsMenu() {
+        boolean running = true;
+
+        while (running) {
+            System.out.println("\n=== Управление гостями ===");
+            System.out.println("1. Зарегистрировать гостя");
+            System.out.println("2. Показать всех гостей");
+            System.out.println("0. Назад");
+            System.out.print("Выберите действие: ");
+
+            String choice = scanner.nextLine().trim();
+
+            switch (choice) {
+                case "1":
+                    addGuest();
+                    break;
+
+                case "2":
+                    listGuests();
+                    break;
+
+                case "0":
+                    running = false;
+                    break;
+
+                default:
+                    System.out.println("Неизвестная команда.");
+                    break;
+            }
+        }
+    }
+
+    private void addGuest() {
+        try {
+            System.out.print("Введите имя гостя: ");
+            String name = scanner.nextLine();
+
+            System.out.print("Введите email: ");
+            String email = scanner.nextLine();
+
+            System.out.print("Введите телефон: ");
+            String phone = scanner.nextLine();
+
+            Guest guest = guestService.createGuest(
+                    name,
+                    email,
+                    phone
+            );
+
+            System.out.println("Гость успешно зарегистрирован!");
+            System.out.println("ID гостя: " + guest.getId());
+
+        } catch (AppException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+    }
+
+    private void listGuests() {
+        List<Guest> guests = guestService.getAllGuests();
+
+        if (guests.isEmpty()) {
+            System.out.println("Зарегистрированных гостей пока нет.");
+            return;
+        }
+
+        System.out.println("\n=== Список гостей ===");
+
+        for (Guest guest : guests) {
+            System.out.println(
+                    "ID: " + guest.getId()
+                            + " | Имя: " + guest.getName()
+                            + " | Email: " + guest.getEmail()
+                            + " | Телефон: " + guest.getPhone()
             );
         }
     }
