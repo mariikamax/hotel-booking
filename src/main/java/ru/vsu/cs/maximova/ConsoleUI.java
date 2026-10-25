@@ -1,5 +1,6 @@
 package ru.vsu.cs.maximova;
 
+import ru.vsu.cs.maximova.entity.Booking;
 import ru.vsu.cs.maximova.entity.Guest;
 import ru.vsu.cs.maximova.entity.Room;
 import ru.vsu.cs.maximova.entity.RoomType;
@@ -9,8 +10,11 @@ import ru.vsu.cs.maximova.service.GuestService;
 import ru.vsu.cs.maximova.service.RoomService;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 public class ConsoleUI {
 
@@ -42,22 +46,16 @@ public class ConsoleUI {
                 case "1":
                     roomsMenu();
                     break;
-
                 case "2":
                     guestsMenu();
                     break;
-
                 case "3":
-                    System.out.println(
-                            "Управление бронированиями будет добавлено следующим этапом."
-                    );
+                    bookingsMenu();
                     break;
-
                 case "0":
                     running = false;
                     System.out.println("Программа завершена.");
                     break;
-
                 default:
                     System.out.println("Неизвестная команда.");
                     break;
@@ -90,15 +88,12 @@ public class ConsoleUI {
                 case "1":
                     addRoom();
                     break;
-
                 case "2":
                     listRooms();
                     break;
-
                 case "0":
                     running = false;
                     break;
-
                 default:
                     System.out.println("Неизвестная команда.");
                     break;
@@ -112,7 +107,6 @@ public class ConsoleUI {
             int number = Integer.parseInt(scanner.nextLine().trim());
 
             System.out.println("Доступные типы номеров:");
-
             for (RoomType type : RoomType.values()) {
                 System.out.println("- " + type);
             }
@@ -133,10 +127,7 @@ public class ConsoleUI {
             );
 
             Room room = roomService.createRoom(
-                    number,
-                    type,
-                    price,
-                    capacity
+                    number, type, price, capacity
             );
 
             System.out.println("Номер успешно добавлен!");
@@ -185,15 +176,12 @@ public class ConsoleUI {
                 case "1":
                     addGuest();
                     break;
-
                 case "2":
                     listGuests();
                     break;
-
                 case "0":
                     running = false;
                     break;
-
                 default:
                     System.out.println("Неизвестная команда.");
                     break;
@@ -213,9 +201,7 @@ public class ConsoleUI {
             String phone = scanner.nextLine();
 
             Guest guest = guestService.createGuest(
-                    name,
-                    email,
-                    phone
+                    name, email, phone
             );
 
             System.out.println("Гость успешно зарегистрирован!");
@@ -243,6 +229,184 @@ public class ConsoleUI {
                             + " | Email: " + guest.getEmail()
                             + " | Телефон: " + guest.getPhone()
             );
+        }
+    }
+
+
+    private void bookingsMenu() {
+        boolean running = true;
+
+        while (running) {
+            System.out.println("\n=== Управление бронированиями ===");
+            System.out.println("1. Создать бронирование");
+            System.out.println("2. Показать все бронирования");
+            System.out.println("3. Отменить бронирование");
+            System.out.println("4. Завершить бронирование");
+            System.out.println("0. Назад");
+            System.out.print("Выберите действие: ");
+
+            String choice = scanner.nextLine().trim();
+
+            switch (choice) {
+                case "1":
+                    addBooking();
+                    break;
+                case "2":
+                    listBookings();
+                    break;
+                case "3":
+                    cancelBooking();
+                    break;
+                case "4":
+                    completeBooking();
+                    break;
+                case "0":
+                    running = false;
+                    break;
+                default:
+                    System.out.println("Неизвестная команда.");
+                    break;
+            }
+        }
+    }
+
+    private void addBooking() {
+        try {
+            List<Guest> guests = guestService.getAllGuests();
+            List<Room> rooms = roomService.getAllRooms();
+
+            if (guests.isEmpty()) {
+                System.out.println(
+                        "Сначала зарегистрируйте хотя бы одного гостя."
+                );
+                return;
+            }
+
+            if (rooms.isEmpty()) {
+                System.out.println(
+                        "Сначала добавьте хотя бы один номер."
+                );
+                return;
+            }
+
+            System.out.println("\n=== Зарегистрированные гости ===");
+            for (Guest guest : guests) {
+                System.out.println(
+                        "ID: " + guest.getId()
+                                + " | Имя: " + guest.getName()
+                                + " | Email: " + guest.getEmail()
+                );
+            }
+
+            System.out.print("Введите ID гостя: ");
+            UUID guestId = UUID.fromString(
+                    scanner.nextLine().trim()
+            );
+
+            System.out.println("\n=== Доступные для выбора номера ===");
+            for (Room room : rooms) {
+                System.out.println(
+                        "ID: " + room.getId()
+                                + " | Номер: " + room.getNumber()
+                                + " | Тип: " + room.getType()
+                                + " | Цена за ночь: " + room.getPricePerNight()
+                                + " | Вместимость: " + room.getCapacity()
+                );
+            }
+
+            System.out.print("Введите ID номера: ");
+            UUID roomId = UUID.fromString(
+                    scanner.nextLine().trim()
+            );
+
+            System.out.print("Дата заезда (ГГГГ-ММ-ДД): ");
+            LocalDate checkIn = LocalDate.parse(
+                    scanner.nextLine().trim()
+            );
+
+            System.out.print("Дата выезда (ГГГГ-ММ-ДД): ");
+            LocalDate checkOut = LocalDate.parse(
+                    scanner.nextLine().trim()
+            );
+
+            System.out.print("Количество гостей: ");
+            int guestsCount = Integer.parseInt(
+                    scanner.nextLine().trim()
+            );
+
+            Booking booking = bookingService.createBooking(
+                    guestId,
+                    roomId,
+                    checkIn,
+                    checkOut,
+                    guestsCount
+            );
+
+            System.out.println("\nБронирование успешно создано!");
+            System.out.println("ID бронирования: " + booking.getId());
+            System.out.println("Стоимость: " + booking.getTotalPrice());
+            System.out.println("Статус: " + booking.getStatus());
+
+        } catch (AppException
+                 | IllegalArgumentException
+                 | DateTimeParseException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+    }
+
+    private void listBookings() {
+        List<Booking> bookings = bookingService.getAllBookings();
+
+        if (bookings.isEmpty()) {
+            System.out.println("Бронирований пока нет.");
+            return;
+        }
+
+        System.out.println("\n=== Список бронирований ===");
+
+        for (Booking booking : bookings) {
+            System.out.println(
+                    "ID: " + booking.getId()
+                            + " | Гость: " + booking.getGuest().getName()
+                            + " | Номер: " + booking.getRoom().getNumber()
+                            + " | Заезд: " + booking.getCheckIn()
+                            + " | Выезд: " + booking.getCheckOut()
+                            + " | Гостей: " + booking.getGuestsCount()
+                            + " | Стоимость: " + booking.getTotalPrice()
+                            + " | Статус: " + booking.getStatus()
+            );
+        }
+    }
+
+    private void cancelBooking() {
+        try {
+            System.out.print("Введите ID бронирования для отмены: ");
+            UUID bookingId = UUID.fromString(
+                    scanner.nextLine().trim()
+            );
+
+            bookingService.cancelBooking(bookingId);
+
+            System.out.println("Бронирование отменено.");
+
+        } catch (AppException | IllegalArgumentException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+    }
+
+    private void completeBooking() {
+        try {
+            System.out.print("Введите ID завершённого бронирования: ");
+            UUID bookingId = UUID.fromString(
+                    scanner.nextLine().trim()
+            );
+
+            bookingService.completeBooking(bookingId);
+
+            System.out.println("Бронирование завершено.");
+
+        } catch (AppException | IllegalArgumentException e) {
+            System.out.println("Ошибка: " + e.getMessage());
         }
     }
 }
