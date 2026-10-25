@@ -1,9 +1,14 @@
 package ru.vsu.cs.maximova;
 
+import ru.vsu.cs.maximova.entity.Room;
+import ru.vsu.cs.maximova.entity.RoomType;
+import ru.vsu.cs.maximova.ex.AppException;
 import ru.vsu.cs.maximova.service.BookingService;
 import ru.vsu.cs.maximova.service.GuestService;
 import ru.vsu.cs.maximova.service.RoomService;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Scanner;
 
 public class ConsoleUI {
@@ -33,20 +38,18 @@ public class ConsoleUI {
 
             switch (choice) {
                 case "1":
-                    System.out.println(
-                            "Раздел управления номерами будет добавлен следующим этапом."
-                    );
+                    roomsMenu();
                     break;
 
                 case "2":
                     System.out.println(
-                            "Раздел управления гостями будет добавлен следующим этапом."
+                            "Управление гостями будет добавлено следующим этапом."
                     );
                     break;
 
                 case "3":
                     System.out.println(
-                            "Раздел бронирования будет добавлен следующим этапом."
+                            "Управление бронированиями будет добавлено следующим этапом."
                     );
                     break;
 
@@ -56,9 +59,7 @@ public class ConsoleUI {
                     break;
 
                 default:
-                    System.out.println(
-                            "Неизвестная команда. Попробуйте ещё раз."
-                    );
+                    System.out.println("Неизвестная команда.");
                     break;
             }
         }
@@ -70,5 +71,94 @@ public class ConsoleUI {
         System.out.println("2. Управление гостями");
         System.out.println("3. Управление бронированиями");
         System.out.println("0. Выход");
+    }
+
+    private void roomsMenu() {
+        boolean running = true;
+
+        while (running) {
+            System.out.println("\n=== Управление номерами ===");
+            System.out.println("1. Добавить номер");
+            System.out.println("2. Показать все номера");
+            System.out.println("0. Назад");
+            System.out.print("Выберите действие: ");
+
+            String choice = scanner.nextLine().trim();
+
+            switch (choice) {
+                case "1":
+                    addRoom();
+                    break;
+
+                case "2":
+                    listRooms();
+                    break;
+
+                case "0":
+                    running = false;
+                    break;
+
+                default:
+                    System.out.println("Неизвестная команда.");
+                    break;
+            }
+        }
+    }
+
+    private void addRoom() {
+        try {
+            System.out.print("Введите номер комнаты: ");
+            int number = Integer.parseInt(scanner.nextLine().trim());
+
+            System.out.println("Доступные типы номеров:");
+            for (RoomType type : RoomType.values()) {
+                System.out.println("- " + type);
+            }
+
+            System.out.print("Введите тип номера: ");
+            RoomType type = RoomType.valueOf(
+                    scanner.nextLine().trim().toUpperCase()
+            );
+
+            System.out.print("Введите стоимость за ночь: ");
+            BigDecimal price = new BigDecimal(scanner.nextLine().trim());
+
+            System.out.print("Введите вместимость: ");
+            int capacity = Integer.parseInt(scanner.nextLine().trim());
+
+            Room room = roomService.createRoom(
+                    number,
+                    type,
+                    price,
+                    capacity
+            );
+
+            System.out.println("Номер успешно добавлен!");
+            System.out.println("ID номера: " + room.getId());
+
+        } catch (AppException | IllegalArgumentException e) {
+            System.out.println("Ошибка: " + e.getMessage());
+        }
+    }
+
+    private void listRooms() {
+        List<Room> rooms = roomService.getAllRooms();
+
+        if (rooms.isEmpty()) {
+            System.out.println("Номера пока не добавлены.");
+            return;
+        }
+
+        System.out.println("\n=== Список номеров ===");
+
+        for (Room room : rooms) {
+            System.out.println(
+                    "ID: " + room.getId()
+                            + " | Номер: " + room.getNumber()
+                            + " | Тип: " + room.getType()
+                            + " | Цена за ночь: " + room.getPricePerNight()
+                            + " | Вместимость: " + room.getCapacity()
+            );
+        }
     }
 }
