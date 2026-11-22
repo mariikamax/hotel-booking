@@ -1,4 +1,18 @@
+
 services:
+  app:
+    build: .
+    container_name: hotel-booking-app
+    stdin_open: true
+    tty: true
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/hotel_booking
+      DB_USERNAME: hotel_user
+      DB_PASSWORD: hotel_password
+
   db:
     image: postgres:16
     container_name: hotel-booking-db
