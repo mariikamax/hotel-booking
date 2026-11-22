@@ -170,6 +170,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         booking.setStatus(BookingStatus.CANCELLED);
+        bookingRepository.save(booking);
     }
 
     @Override
@@ -183,5 +184,6 @@ public class BookingServiceImpl implements BookingService {
         }
 
         booking.setStatus(BookingStatus.COMPLETED);
+        bookingRepository.save(booking);
     }
 }

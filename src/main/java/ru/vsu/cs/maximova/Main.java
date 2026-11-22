@@ -1,10 +1,11 @@
+
 package ru.vsu.cs.maximova;
 
 import ru.vsu.cs.maximova.config.DatabaseConfig;
 import ru.vsu.cs.maximova.config.DatabaseMigration;
-import ru.vsu.cs.maximova.repository.impl.InMemoryBookingRepository;
-import ru.vsu.cs.maximova.repository.impl.InMemoryGuestRepository;
-import ru.vsu.cs.maximova.repository.impl.InMemoryRoomRepository;
+import ru.vsu.cs.maximova.repository.jdbc.JdbcBookingRepository;
+import ru.vsu.cs.maximova.repository.jdbc.JdbcGuestRepository;
+import ru.vsu.cs.maximova.repository.jdbc.JdbcRoomRepository;
 import ru.vsu.cs.maximova.service.BookingService;
 import ru.vsu.cs.maximova.service.GuestService;
 import ru.vsu.cs.maximova.service.RoomService;
@@ -21,14 +22,18 @@ public class Main {
 
         DatabaseMigration.migrate(dataSource);
 
-        InMemoryRoomRepository roomRepository =
-                new InMemoryRoomRepository();
+        JdbcRoomRepository roomRepository =
+                new JdbcRoomRepository(dataSource);
 
-        InMemoryGuestRepository guestRepository =
-                new InMemoryGuestRepository();
+        JdbcGuestRepository guestRepository =
+                new JdbcGuestRepository(dataSource);
 
-        InMemoryBookingRepository bookingRepository =
-                new InMemoryBookingRepository();
+        JdbcBookingRepository bookingRepository =
+                new JdbcBookingRepository(
+                        dataSource,
+                        guestRepository,
+                        roomRepository
+                );
 
         RoomService roomService =
                 new RoomServiceImpl(roomRepository);
