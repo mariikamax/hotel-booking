@@ -15,14 +15,24 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 
 public class ConsoleUI {
+    static {
+        try {
+            System.setOut(new PrintStream(System.out, true, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new RuntimeException("Не удалось настроить UTF-8", e);
+        }
+    }
 
     private final RoomService roomService;
     private final GuestService guestService;
     private final BookingService bookingService;
-    private final Scanner scanner = new Scanner(System.in);
-
+    private final Scanner scanner =
+            new Scanner(System.in, StandardCharsets.UTF_8);
     public ConsoleUI(
             RoomService roomService,
             GuestService guestService,

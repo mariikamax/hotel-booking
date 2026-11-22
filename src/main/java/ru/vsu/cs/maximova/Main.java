@@ -1,8 +1,11 @@
+
 package ru.vsu.cs.maximova;
 
-import ru.vsu.cs.maximova.repository.impl.InMemoryBookingRepository;
-import ru.vsu.cs.maximova.repository.impl.InMemoryGuestRepository;
-import ru.vsu.cs.maximova.repository.impl.InMemoryRoomRepository;
+import ru.vsu.cs.maximova.config.DatabaseConfig;
+import ru.vsu.cs.maximova.config.DatabaseMigration;
+import ru.vsu.cs.maximova.repository.jdbc.JdbcBookingRepository;
+import ru.vsu.cs.maximova.repository.jdbc.JdbcGuestRepository;
+import ru.vsu.cs.maximova.repository.jdbc.JdbcRoomRepository;
 import ru.vsu.cs.maximova.service.BookingService;
 import ru.vsu.cs.maximova.service.GuestService;
 import ru.vsu.cs.maximova.service.RoomService;
@@ -10,17 +13,27 @@ import ru.vsu.cs.maximova.service.impl.BookingServiceImpl;
 import ru.vsu.cs.maximova.service.impl.GuestServiceImpl;
 import ru.vsu.cs.maximova.service.impl.RoomServiceImpl;
 
+import javax.sql.DataSource;
+
 public class Main {
 
     public static void main(String[] args) {
-        InMemoryRoomRepository roomRepository =
-                new InMemoryRoomRepository();
+        DataSource dataSource = DatabaseConfig.createDataSource();
 
-        InMemoryGuestRepository guestRepository =
-                new InMemoryGuestRepository();
+        DatabaseMigration.migrate(dataSource);
 
-        InMemoryBookingRepository bookingRepository =
-                new InMemoryBookingRepository();
+        JdbcRoomRepository roomRepository =
+                new JdbcRoomRepository(dataSource);
+
+        JdbcGuestRepository guestRepository =
+                new JdbcGuestRepository(dataSource);
+
+        JdbcBookingRepository bookingRepository =
+                new JdbcBookingRepository(
+                        dataSource,
+                        guestRepository,
+                        roomRepository
+                );
 
         RoomService roomService =
                 new RoomServiceImpl(roomRepository);

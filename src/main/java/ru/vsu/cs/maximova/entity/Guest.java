@@ -1,4 +1,5 @@
 package ru.vsu.cs.maximova.entity;
+import java.util.UUID;
 
 public class Guest extends AbstractEntity {
 
@@ -22,5 +23,12 @@ public class Guest extends AbstractEntity {
 
     public String getPhone() {
         return phone;
+    }
+
+    public Guest(UUID id, String name, String email, String phone) {
+        super(id);
+        this.name = name;
+        this.email = email;
+        this.phone = phone;
     }
 }

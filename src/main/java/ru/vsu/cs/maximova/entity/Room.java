@@ -1,4 +1,5 @@
 package ru.vsu.cs.maximova.entity;
+import java.util.UUID;
 
 import java.math.BigDecimal;
 
@@ -35,5 +36,18 @@ public class Room extends AbstractEntity {
 
     public int getCapacity() {
         return capacity;
+    }
+    public Room(
+            UUID id,
+            int number,
+            RoomType type,
+            BigDecimal pricePerNight,
+            int capacity
+    ) {
+        super(id);
+        this.number = number;
+        this.type = type;
+        this.pricePerNight = pricePerNight;
+        this.capacity = capacity;
     }
 }
