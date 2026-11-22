@@ -1,5 +1,7 @@
 package ru.vsu.cs.maximova;
 
+import ru.vsu.cs.maximova.config.DatabaseConfig;
+import ru.vsu.cs.maximova.config.DatabaseMigration;
 import ru.vsu.cs.maximova.repository.impl.InMemoryBookingRepository;
 import ru.vsu.cs.maximova.repository.impl.InMemoryGuestRepository;
 import ru.vsu.cs.maximova.repository.impl.InMemoryRoomRepository;
@@ -10,9 +12,15 @@ import ru.vsu.cs.maximova.service.impl.BookingServiceImpl;
 import ru.vsu.cs.maximova.service.impl.GuestServiceImpl;
 import ru.vsu.cs.maximova.service.impl.RoomServiceImpl;
 
+import javax.sql.DataSource;
+
 public class Main {
 
     public static void main(String[] args) {
+        DataSource dataSource = DatabaseConfig.createDataSource();
+
+        DatabaseMigration.migrate(dataSource);
+
         InMemoryRoomRepository roomRepository =
                 new InMemoryRoomRepository();
 

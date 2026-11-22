@@ -8,7 +8,7 @@ import javax.sql.DataSource;
 public class DatabaseConfig {
 
     private static final String DEFAULT_URL =
-            "jdbc:postgresql://localhost:5432/hotel_booking";
+            "jdbc:postgresql://127.0.0.1:5434/hotel_booking";
 
     private static final String DEFAULT_USERNAME = "hotel_user";
     private static final String DEFAULT_PASSWORD = "hotel_password";
