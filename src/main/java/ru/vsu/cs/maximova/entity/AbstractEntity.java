@@ -7,7 +7,11 @@ public abstract class AbstractEntity {
     private final UUID id;
 
     protected AbstractEntity() {
-        this.id = UUID.randomUUID();
+        this(UUID.randomUUID());
+    }
+
+    protected AbstractEntity(UUID id) {
+        this.id = id;
     }
 
     public UUID getId() {

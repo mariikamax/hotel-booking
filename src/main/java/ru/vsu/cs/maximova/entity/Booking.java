@@ -1,4 +1,5 @@
 package ru.vsu.cs.maximova.entity;
+import java.util.UUID;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,6 +29,26 @@ public class Booking extends AbstractEntity {
         this.guestsCount = guestsCount;
         this.totalPrice = totalPrice;
         this.status = BookingStatus.ACTIVE;
+    }
+
+    public Booking(
+            UUID id,
+            Guest guest,
+            Room room,
+            LocalDate checkIn,
+            LocalDate checkOut,
+            int guestsCount,
+            BigDecimal totalPrice,
+            BookingStatus status
+    ) {
+        super(id);
+        this.guest = guest;
+        this.room = room;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.guestsCount = guestsCount;
+        this.totalPrice = totalPrice;
+        this.status = status;
     }
 
     public Guest getGuest() {
